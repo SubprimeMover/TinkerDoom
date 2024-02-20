@@ -32,8 +32,6 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char rcsid[] = "$Id: linux.c,v 1.3 1997/01/26 07:45:01 b1 Exp $";
-
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -105,7 +103,11 @@ I_SubmitOutputBuffer
 ( void*	samples,
   int	samplecount )
 {
-    write(audio_fd, samples, samplecount*4);
+    int writtenSize = write(audio_fd, samples, samplecount*4);
+    if (writtenSize != samplecount * 4)
+    {
+        fprintf(stderr, "Could not submit output buffer.\n");
+    }
 }
 
 void I_ShutdownSound(void)

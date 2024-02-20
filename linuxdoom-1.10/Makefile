@@ -6,8 +6,8 @@
 #
 CC=  gcc -m32  # gcc or g++
 
-CFLAGS=-g -Wall -DNORMALUNIX -DLINUX -std=c11 -Werror=implicit-function-declaration -D_DEFAULT_SOURCE  # Needed for sigaction # -DUSEASM 
-LDFLAGS=-L/usr/X11R6/lib # -L/usr/lib/i386-linux-gnu/ 
+CFLAGS=-g -Wall -DNORMALUNIX -DLINUX -std=c11 -Werror -D_DEFAULT_SOURCE # -DUSEASM 
+LDFLAGS=-L/usr/X11R6/lib
 LIBS=-lXext -lX11 -lnsl -lm
 
 # subdirectory for objects

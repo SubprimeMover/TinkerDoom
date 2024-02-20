@@ -36,10 +36,6 @@
 //-----------------------------------------------------------------------------
 
 
-static const char rcsid[] = "$Id: soundsrv.c,v 1.3 1997/01/29 22:40:44 b1 Exp $";
-
-
-
 #include <math.h>
 #include <sys/types.h>
 #include <stdio.h>
@@ -508,7 +504,7 @@ addsfx
 }
 
 
-void outputushort(int num)
+/*void outputushort(int num)
 {
 
     static unsigned char	buff[5] = { 0, 0, 0, 0, '\n' };
@@ -517,7 +513,7 @@ void outputushort(int num)
     // outputs a 16-bit # in hex or "xxxx" if -1.
     if (num < 0)
     {
-	write(1, badbuff, 5);
+	(void)write(1, badbuff, 5);
     }
     else
     {
@@ -529,9 +525,9 @@ void outputushort(int num)
 	buff[2] += buff[2] > 9 ? 'a'-10 : '0';
 	buff[3] = num & 0xf;
 	buff[3] += buff[3] > 9 ? 'a'-10 : '0';
-	write(1, buff, 5);
+	(void)write(1, buff, 5);
     }
-}
+}*/
 
 void initdata(void)
 {
@@ -593,7 +589,6 @@ main
     int		rc;
     int		nrc;
     int		sndnum;
-    int		handle = 0;
     
     unsigned char	commandbuf[10];
     struct timeval	zerowait = { 0, 0 };
@@ -651,10 +646,15 @@ main
 
 			switch (commandbuf[0])
 			{
+			  int readSize;
+			  int writtenSize; 
 			  case 'p':
 			    // play a new sound effect
-			    read(0, commandbuf, 9);
-
+			    readSize = read(0, commandbuf, 9);
+				if (readSize != 9)
+				{
+					fprintf(stderr, "soundsrv.c: Could not read command.\n");
+				}
 			    if (snd_verbose)
 			    {
 				commandbuf[9]=0;
@@ -685,26 +685,38 @@ main
 			    vol = (commandbuf[4]<<4) + commandbuf[5];
 			    sep = (commandbuf[6]<<4) + commandbuf[7];
 
-			    handle = addsfx(sndnum, vol, step, sep);
+			    (void)addsfx(sndnum, vol, step, sep);
 			    // returns the handle
 			    //	outputushort(handle);
 			    break;
 			    
 			  case 'q':
-			    read(0, commandbuf, 1);
+			    readSize = read(0, commandbuf, 1);
+				if (readSize != 1)
+				{
+					fprintf(stderr, "soundsrv.c: Could not read command.\n");
+				}
 			    waitingtofinish = 1; rc = 0;
 			    break;
 			    
 			  case 's':
 			  {
 			      int fd;
-			      read(0, commandbuf, 3);
+			      readSize = read(0, commandbuf, 3);
+				  if (readSize != 9)
+				  {
+					fprintf(stderr, "soundsrv.c: Could not read command.\n");
+				  }
 			      commandbuf[2] = 0;
 			      fd = open((char*)commandbuf, O_CREAT|O_WRONLY, 0644);
 			      commandbuf[0] -= commandbuf[0]>='a' ? 'a'-10 : '0';
 			      commandbuf[1] -= commandbuf[1]>='a' ? 'a'-10 : '0';
 			      sndnum = (commandbuf[0]<<4) + commandbuf[1];
-			      write(fd, S_sfx[sndnum].data, lengths[sndnum]);
+			      writtenSize = write(fd, S_sfx[sndnum].data, lengths[sndnum]);
+				  if (writtenSize != lengths[sndnum])
+				  {
+					fprintf(stderr, "soundsrv.c: Could not write sound effect.\n");
+				  }
 			      close(fd);
 			  }
 			  break;

@@ -35,10 +35,6 @@
 //-----------------------------------------------------------------------------
 
 
-static const char rcsid[] = "$Id: wadread.c,v 1.3 1997/01/30 19:54:23 b1 Exp $";
-
-
-
 #include <malloc.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -167,10 +163,14 @@ void openwad(char* wadname)
     if (wadfile < 0)
 	derror("Could not open wadfile");
 
-    read(wadfile, &header, sizeof header);
+    int readSize = read(wadfile, &header, sizeof header);
 
     if (strncmp(header.identification, "IWAD", 4))
-	derror("wadfile has weirdo header");
+	    derror("wadfile has weirdo header");
+    if (readSize != sizeof(header))
+    {
+        derror("Cannot read WAD header.");
+    }
 
     numlumps = LONG(header.numlumps);
     tableoffset = LONG(header.infotableofs);
@@ -181,7 +181,11 @@ void openwad(char* wadname)
 
     // get the lumpinfo table
     lseek(wadfile, tableoffset, SEEK_SET);
-    read(wadfile, filetable, tablefilelength);
+    readSize = read(wadfile, filetable, tablefilelength);
+    if (readSize != tablefilelength)
+    {
+        derror("Cannote read table file.");
+    }
 
     // process the table to make the endianness right and shift it down
     for (i=0 ; i<numlumps ; i++)
@@ -212,16 +216,20 @@ loadlump
 
     if (i == numlumps)
     {
-	// fprintf(stderr,
-	//   "Could not find lumpname [%s]\n", lumpname);
-	lump = 0;
+	    // fprintf(stderr,
+	    //   "Could not find lumpname [%s]\n", lumpname);
+	    lump = 0;
     }
     else
     {
-	lump = (void *) malloc(lumpinfo[i].size);
-	lseek(lumpinfo[i].handle, lumpinfo[i].filepos, SEEK_SET);
-	read(lumpinfo[i].handle, lump, lumpinfo[i].size);
-	*size = lumpinfo[i].size;
+	    lump = (void *) malloc(lumpinfo[i].size);
+	    lseek(lumpinfo[i].handle, lumpinfo[i].filepos, SEEK_SET);
+	    int readSize = read(lumpinfo[i].handle, lump, lumpinfo[i].size);
+        if (readSize != lumpinfo[i].size)
+        {
+            derror("Cannot read lump.");
+        }
+	    *size = lumpinfo[i].size;
     }
 
     return lump;

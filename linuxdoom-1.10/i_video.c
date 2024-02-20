@@ -21,8 +21,6 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -35,6 +33,7 @@ rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 #include <X11/keysym.h>
 
 #include <X11/extensions/XShm.h>
+#include <X11/XKBlib.h>
 // Had to dig up XShm.c for this one.
 // It is in the libXext, but not in the XFree86 headers.
 #ifdef LINUX
@@ -100,7 +99,7 @@ int xlatekey(void)
 
     int rc;
 
-    switch(rc = XKeycodeToKeysym(X_display, X_event.xkey.keycode, 0))
+    switch(rc = XkbKeycodeToKeysym(X_display, X_event.xkey.keycode, 0, 0))
     {
       case XK_Left:	rc = KEY_LEFTARROW;	break;
       case XK_Right:	rc = KEY_RIGHTARROW;	break;
@@ -686,7 +685,7 @@ void grabsharedmemory(int size)
   // attach to the shared memory segment
   image->data = X_shminfo.shmaddr = shmat(id, 0, 0);
   
-  fprintf(stderr, "shared memory id=%d, addr=0x%lx\n", id,
+  fprintf(stderr, "shared memory id=%d, addr=0x%x\n", id,
 	  (uintptr_t) (image->data));
 }
 

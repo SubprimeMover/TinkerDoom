@@ -7,7 +7,7 @@
 #
 
 CC=gcc -m32
-CFLAGS=-O -DNORMALUNIX -DLINUX -std=c11 -Wall -Werror=implicit-function-declaration -g
+CFLAGS=-O -DNORMALUNIX -DLINUX -std=c11 -Wall -g -Werror
 LDFLAGS=
 LIBS=-lm
 
