@@ -4,10 +4,10 @@
 #
 # $Log:$
 #
-CC=  gcc  # gcc or g++
+CC=  gcc -m32  # gcc or g++
 
-CFLAGS=-g -Wall -DNORMALUNIX -DLINUX # -DUSEASM 
-LDFLAGS=-L/usr/X11R6/lib
+CFLAGS=-g -Wall -DNORMALUNIX -DLINUX -std=c11 -Werror=implicit-function-declaration -D_DEFAULT_SOURCE  # Needed for sigaction # -DUSEASM 
+LDFLAGS=-L/usr/X11R6/lib # -L/usr/lib/i386-linux-gnu/ 
 LIBS=-lXext -lX11 -lnsl -lm
 
 # subdirectory for objects

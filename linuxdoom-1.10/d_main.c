@@ -34,6 +34,7 @@ static const char rcsid[] = "$Id: d_main.c,v 1.8 1997/02/03 22:45:09 b1 Exp $";
 #ifdef NORMALUNIX
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -150,7 +151,8 @@ int 		eventtail;
 void D_PostEvent (event_t* ev)
 {
     events[eventhead] = *ev;
-    eventhead = (++eventhead)&(MAXEVENTS-1);
+	++eventhead;
+    eventhead = eventhead & (MAXEVENTS-1);
 }
 
 
@@ -167,12 +169,16 @@ void D_ProcessEvents (void)
 	 && (W_CheckNumForName("map01")<0) )
       return;
 	
-    for ( ; eventtail != eventhead ; eventtail = (++eventtail)&(MAXEVENTS-1) )
+    while (eventtail != eventhead)
     {
-	ev = &events[eventtail];
-	if (M_Responder (ev))
-	    continue;               // menu ate the event
-	G_Responder (ev);
+		ev = &events[eventtail];
+		boolean menuResponded = M_Responder(ev);
+		if (!menuResponded)
+		{
+			G_Responder(ev);
+		}
+		++eventtail;
+		eventtail = eventtail & (MAXEVENTS-1);
     }
 }
 
@@ -1119,7 +1125,7 @@ void D_DoomMain (void)
 	// for statistics driver
 	extern  void*	statcopy;                            
 
-	statcopy = (void*)atoi(myargv[p+1]);
+	statcopy = (void*)(uintptr_t)atoi(myargv[p+1]);
 	printf ("External statistics registered.\n");
     }
     

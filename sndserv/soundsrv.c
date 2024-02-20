@@ -47,6 +47,7 @@ static const char rcsid[] = "$Id: soundsrv.c,v 1.3 1997/01/29 22:40:44 b1 Exp $"
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 #include <malloc.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -405,8 +406,6 @@ grabdata
 static struct timeval		last={0,0};
 //static struct timeval		now;
 
-static struct timezone		whocares;
-
 void updatesounds(void)
 {
 
@@ -549,7 +548,7 @@ void initdata(void)
 	channels[i] = 0;
     }
     
-    gettimeofday(&last, &whocares);
+    gettimeofday(&last, NULL);
 
     for (i=-128 ; i<128 ; i++)
 	steptablemid[i] = pow(2.0, (i/64.0))*65536.0;
