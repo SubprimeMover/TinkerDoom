@@ -87,7 +87,7 @@ int		doPointerWarp = POINTER_WARP_COUNTDOWN;
 // replace each 320x200 pixel with multiply*multiply pixels.
 // According to Dave Taylor, it still is a bonehead thing
 // to use ....
-static int	multiply=3;
+static int	multiply=1;
 
 
 //
@@ -836,28 +836,28 @@ void I_InitGraphics(void)
     oktodraw = 0;
     while (!oktodraw)
     {
-	XNextEvent(X_display, &X_event);
-	if (X_event.type == Expose
-	    && !X_event.xexpose.count)
-	{
-	    oktodraw = 1;
-	}
+		XNextEvent(X_display, &X_event);
+		if (X_event.type == Expose
+		    && !X_event.xexpose.count)
+		{
+		    oktodraw = 1;
+		}
     }
 
     // grabs the pointer so it is restricted to this window
     if (grabMouse)
-	XGrabPointer(X_display, X_mainWindow, True,
-		     ButtonPressMask|ButtonReleaseMask|PointerMotionMask,
-		     GrabModeAsync, GrabModeAsync,
-		     X_mainWindow, None, CurrentTime);
+		XGrabPointer(X_display, X_mainWindow, True,
+			     ButtonPressMask|ButtonReleaseMask|PointerMotionMask,
+			     GrabModeAsync, GrabModeAsync,
+			     X_mainWindow, None, CurrentTime);
 
     if (doShm)
     {
 
-	X_shmeventtype = XShmGetEventBase(X_display) + ShmCompletion;
+		X_shmeventtype = XShmGetEventBase(X_display) + ShmCompletion;
 
-	// create the image
-	image = XShmCreateImage(	X_display,
+		// create the image
+		image = XShmCreateImage(	X_display,
 					X_visual,
 					8,
 					ZPixmap,
@@ -866,52 +866,52 @@ void I_InitGraphics(void)
 					X_width,
 					X_height );
 
-	grabsharedmemory(image->bytes_per_line * image->height);
+		grabsharedmemory(image->bytes_per_line * image->height);
 
 
-	// UNUSED
-	// create the shared memory segment
-	// X_shminfo.shmid = shmget (IPC_PRIVATE,
-	// image->bytes_per_line * image->height, IPC_CREAT | 0777);
-	// if (X_shminfo.shmid < 0)
-	// {
-	// perror("");
-	// I_Error("shmget() failed in InitGraphics()");
-	// }
-	// fprintf(stderr, "shared memory id=%d\n", X_shminfo.shmid);
-	// attach to the shared memory segment
-	// image->data = X_shminfo.shmaddr = shmat(X_shminfo.shmid, 0, 0);
+		// UNUSED
+		// create the shared memory segment
+		// X_shminfo.shmid = shmget (IPC_PRIVATE,
+		// image->bytes_per_line * image->height, IPC_CREAT | 0777);
+		// if (X_shminfo.shmid < 0)
+		// {
+		// perror("");
+		// I_Error("shmget() failed in InitGraphics()");
+		// }
+		// fprintf(stderr, "shared memory id=%d\n", X_shminfo.shmid);
+		// attach to the shared memory segment
+		// image->data = X_shminfo.shmaddr = shmat(X_shminfo.shmid, 0, 0);
 	
 
-	if (!image->data)
-	{
-	    perror("");
-	    I_Error("shmat() failed in InitGraphics()");
-	}
+		if (!image->data)
+		{
+		    perror("");
+		    I_Error("shmat() failed in InitGraphics()");
+		}
 
-	// get the X server to attach to it
-	if (!XShmAttach(X_display, &X_shminfo))
-	    I_Error("XShmAttach() failed in InitGraphics()");
+		// get the X server to attach to it
+		if (!XShmAttach(X_display, &X_shminfo))
+		    I_Error("XShmAttach() failed in InitGraphics()");
 
     }
     else
     {
-	image = XCreateImage(	X_display,
-    				X_visual,
-    				8,
-    				ZPixmap,
-    				0,
-    				(char*)malloc(X_width * X_height),
-    				X_width, X_height,
-    				8,
-    				X_width );
+		image = XCreateImage(	X_display,
+    					X_visual,
+    					8,
+    					ZPixmap,
+    					0,
+    					(char*)malloc(X_width * X_height),
+    					X_width, X_height,
+    					8,
+    					X_width );
 
     }
 
     if (multiply == 1)
-	screens[0] = (unsigned char *) (image->data);
+		screens[0] = (unsigned char *) (image->data);
     else
-	screens[0] = (unsigned char *) malloc (SCREENWIDTH * SCREENHEIGHT);
+		screens[0] = (unsigned char *) malloc (SCREENWIDTH * SCREENHEIGHT);
 
 }
 
